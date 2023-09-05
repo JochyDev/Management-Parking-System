@@ -1,0 +1,34 @@
+{
+  "name": "paking-management-system",
+  "version": "1.0.0",
+  "description": "APIrestfull for a parking management",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index",
+    "start:dev": "node --watch src/index"
+  },
+  "type": "module",
+  "keywords": [
+    "#nodejs",
+    "#express",
+    "#sequelize",
+    "#mysql",
+    "#mongoose",
+    "#mongodb",
+    "#apirestfull",
+    "#parking-system"
+  ],
+  "author": "@JochyDev <joseluisjimenez1998@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "mongoose": "^7.5.0",
+    "mysql2": "^3.6.0",
+    "sequelize": "^6.32.1"
+  },
+  "devDependencies": {
+    "sequelize-cli": "^6.6.1"
+  }
+}
