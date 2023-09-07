@@ -17,6 +17,11 @@ export const UserModel = (sequelize, {Model, DataTypes}) => {
           allowNull: false,
           unique: true
         },
+        phone: {
+          type: DataTypes.STRING(45),
+          allowNull: false,
+          unique: true
+        },
         password: {
             type:  DataTypes.STRING(64),
             allowNull: false

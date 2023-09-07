@@ -1,2 +1,2 @@
-export { getUsers } from './user.controller.js';
+export { getUsers, createUser} from './user.controller.js';
 

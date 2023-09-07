@@ -1,11 +1,12 @@
 import express from 'express';
 import cors from 'cors';
-import db from "../models/index.js";
+import { db } from "../models/index.js";
 
 import { mongodbConection } from '../config/mongodb.config.js';
 
 // Routes
-import { userRoutes } from '../routes/index.js';
+import { userRouter }  from '../routes/index.js';
+
 
 export class Server {
 
@@ -51,7 +52,7 @@ export class Server {
         this.app.use(express.json());
     }
     routes(){
-        this.app.use(this.paths.users, userRoutes);
+        this.app.use(this.paths.users, userRouter);
     }
     
     listen(){

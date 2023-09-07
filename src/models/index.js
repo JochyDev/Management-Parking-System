@@ -9,12 +9,10 @@ const sequelize = new Sequelize(database, username, password, {
   dialect: dialect
 });
 
-const db = {};
+export const db = {};
 
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
 import {UserModel} from "./user.model.js"; 
 db.users = UserModel(sequelize, Sequelize);
-
-export default db;
