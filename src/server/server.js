@@ -5,7 +5,7 @@ import { db } from "../models/index.js";
 import { mongodbConection } from '../config/mongodb.config.js';
 
 // Routes
-import { userRouter }  from '../routes/index.js';
+import { userRouter, authRouter }  from '../routes/index.js';
 
 
 export class Server {
@@ -14,6 +14,7 @@ export class Server {
         this.app = express();
         this.port = process.env.PORT || 8080;
         this.paths = {
+            auth: '/api/auth',
             users: '/api/users',
         }
 
@@ -52,6 +53,7 @@ export class Server {
         this.app.use(express.json());
     }
     routes(){
+        this.app.use(this.paths.auth, authRouter);
         this.app.use(this.paths.users, userRouter);
     }
     
