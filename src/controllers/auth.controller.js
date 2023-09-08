@@ -3,7 +3,7 @@ import bcryptjs from 'bcryptjs';
 import generateJWT from '../helpers/generateJWT.js';
 import { success, error } from "../helpers/handleResponse.js";
 import { db } from '../models/index.js';
-const { users: User} = db;
+const { User} = db;
 
 export const login = async (req, res) => {
 

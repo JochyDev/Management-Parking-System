@@ -2,7 +2,7 @@
 import  bcryptjs  from "bcryptjs";
 import { success, error } from "../helpers/handleResponse.js";
 import { db } from '../models/index.js';
-const { users: User} = db;
+const { User} = db;
 
 export const getUsers = async (req, res) => {
     
