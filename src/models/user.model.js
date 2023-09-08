@@ -1,6 +1,12 @@
 
-export const UserModel = (sequelize, {Model, DataTypes}) => {
-    class User extends Model {}
+export const createModel = (sequelize, {Model, DataTypes}) => {
+    class User extends Model {
+        static associate(models) {
+            // define association here
+            // one-to-many: User-Reservation 
+            this.hasMany(models.Reservation);
+        }
+    }
 
     User.init({
         id: {
@@ -38,3 +44,4 @@ export const UserModel = (sequelize, {Model, DataTypes}) => {
 
     return User;
 };
+
