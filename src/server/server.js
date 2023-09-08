@@ -5,7 +5,7 @@ import { db } from "../models/index.js";
 import { mongodbConection } from '../config/mongodb.config.js';
 
 // Routes
-import { userRouter, authRouter }  from '../routes/index.js';
+import { userRoutes, authRoutes, spotsRoutes, reservationRoutes }  from '../routes/index.js';
 
 
 export class Server {
@@ -16,6 +16,8 @@ export class Server {
         this.paths = {
             auth: '/api/auth',
             users: '/api/users',
+            spots: '/api/spots',
+            reservations: '/api/reservations',
         }
 
         // Conection to Mysql
@@ -53,8 +55,10 @@ export class Server {
         this.app.use(express.json());
     }
     routes(){
-        this.app.use(this.paths.auth, authRouter);
-        this.app.use(this.paths.users, userRouter);
+        this.app.use(this.paths.auth, authRoutes);
+        this.app.use(this.paths.users, userRoutes);
+        this.app.use(this.paths.spots, spotsRoutes);
+        this.app.use(this.paths.reservations, reservationRoutes);
     }
     
     listen(){
