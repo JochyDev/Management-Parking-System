@@ -1,12 +1,13 @@
 import { Op } from 'sequelize';
 import { error, success } from '../helpers/handleResponse.js';
+import { activityLog } from '../helpers/activityLog.js';
 import { db } from '../models/index.js';
 const { Reservation, Spot } = db;
 
 
 
 export const createReservation = async (req, res) => {
-  const { UserId, startDateTime, endDateTime} = req.body;
+  const { UserId, startDateTime= new Date(), endDateTime = new Date()} = req.body;
 
   const totalSpots = await Spot.count();
   let SpotId = null;
@@ -54,7 +55,8 @@ export const createReservation = async (req, res) => {
           endDateTime
       });
 
-        success( res, reservation, 200);
+      activityLog('1', 'PARKING_RESERVATION');
+      success( res, reservation, 200);
     } catch(err) {
         error(res, err, 500);
     };
