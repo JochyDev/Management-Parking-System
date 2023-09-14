@@ -7,7 +7,7 @@ const { Reservation, Spot } = db;
 
 
 export const createReservation = async (req, res) => {
-  const { UserId, startDateTime = new Date(), endDateTime = new Date()} = req.body;
+  const { UserId, startDateTime, endDateTime} = req.body;
 
   const totalSpots = await Spot.count();
   let SpotId = null;

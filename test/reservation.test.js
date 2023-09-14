@@ -24,4 +24,12 @@ describe('Reserve a Parking Spot', () => {
             UserId: expect.any(String)
           }));
     })
+
+    test('POST /api/reservations --> startDatetime and endDateTime are requireds!!!', async () => {
+        const response = await request(app).post('api/reservations').send({
+            UserId: '1'
+        })
+
+        expect(response.status).toEqual(400)
+    })
 })
