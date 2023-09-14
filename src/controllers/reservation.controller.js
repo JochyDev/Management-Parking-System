@@ -108,11 +108,14 @@ export const getCurrentOccupancy = async ( req, res ) => {
       },
     })
 
-    if(parkingSpots.length == 0){
-      return success(res, `The ${totalSpots} parking spots are available right now.`);
+    const ocuupancyDetails = { 
+      totalSpots,
+      occupiedSpot: parkingSpots.length,
+      availableSpots: totalSpots - parkingSpots.length,
+      occupationPercentage: (parkingSpots.length / totalSpots)  * 100 + "%"
     }
 
-    success(res, `Out of the ${totalSpots} parking spots in the parking lot, ${parkingSpots.length} are occupied.`, 200);
+    success(res, ocuupancyDetails, 200);
   } catch (err) {
     error(res, err, 500);
   }
