@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { check } from 'express-validator';
 import { createReservation, cancelReservation, getCurrentOccupancy} from '../controllers/index.js';
 import { validateJWT, validateFields, hasRole } from '../middlewares/index.js';
 
@@ -10,9 +11,17 @@ router.get('/', [
     validateFields
 ], getCurrentOccupancy);
 
-router.post('/', createReservation);
+router.post('/', [
+    validateJWT,
+    check('startDateTime', 'reservation startDateTime is required!').not().isEmpty(),
+    check('endDateTime', 'reservation endDateTime is required!').not().isEmpty(),
+    validateFields
+], createReservation);
 
-router.patch('/:id', cancelReservation);
+router.patch('/:id', [
+    validateJWT,
+    validateFields
+], cancelReservation);
 
 
 export default router;
