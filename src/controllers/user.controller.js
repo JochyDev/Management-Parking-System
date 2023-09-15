@@ -51,12 +51,14 @@ export const updateUser = async ( req, res ) => {
     
     const { id: _id, password, ...data } = req.body;
 
+    console.log(data)
+
     try {
         const num = await User.update(data, {
             where: { id }
         })
         if (num == 1) {
-            const updatedUser = await User.findByPk(3)
+            const updatedUser = await User.findByPk(id)
             success(res, updatedUser, 200);
         } else {
             error(res, `Cannot update User with id=${id}. Maybe User was not found or req.body is empty!`, 400);
