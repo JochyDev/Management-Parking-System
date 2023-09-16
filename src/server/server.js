@@ -5,7 +5,7 @@ import { db } from "../models/index.js";
 import { mongodbConection } from '../config/mongodb.config.js';
 
 // Routes
-import { userRoutes, authRoutes, spotsRoutes, reservationRoutes }  from '../routes/index.js';
+import { userRoutes, authRoutes, spotsRoutes, reservationRoutes, logsRoutes }  from '../routes/index.js';
 
 
 export class Server {
@@ -15,9 +15,10 @@ export class Server {
         this.port = process.env.PORT || 8080;
         this.paths = {
             auth: '/api/auth',
+            logs: '/api/logs',
+            reservations: '/api/reservations',
             users: '/api/users',
             spots: '/api/spots',
-            reservations: '/api/reservations',
         }
 
         // Conection to Mysql
@@ -56,9 +57,10 @@ export class Server {
     }
     routes(){
         this.app.use(this.paths.auth, authRoutes);
+        this.app.use(this.paths.logs, logsRoutes);
+        this.app.use(this.paths.reservations, reservationRoutes);
         this.app.use(this.paths.users, userRoutes);
         this.app.use(this.paths.spots, spotsRoutes);
-        this.app.use(this.paths.reservations, reservationRoutes);
     }
     
     listen(){
