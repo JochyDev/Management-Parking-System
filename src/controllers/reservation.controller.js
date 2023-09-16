@@ -4,8 +4,6 @@ import { activityLog } from '../helpers/activityLog.js';
 import { db } from '../models/index.js';
 const { Reservation, Spot } = db;
 
-
-
 export const createReservation = async (req, res) => {
   
   const { id: UserId } = req.user;
@@ -58,7 +56,7 @@ export const createReservation = async (req, res) => {
           endDateTime
       });
 
-      activityLog('1', 'PARKING_RESERVATION');
+      activityLog(UserId, 'PARKING_RESERVATION');
       success( res, reservation, 200);
     } catch(err) {
         error(res, err, 500);
@@ -67,6 +65,7 @@ export const createReservation = async (req, res) => {
 
 export const cancelReservation = async ( req, res ) => {
 
+  const { id: UserId } = req.user;
   const { id } = req.params;
 
   try {
@@ -75,7 +74,8 @@ export const cancelReservation = async ( req, res ) => {
     });
  
     if (num == 1) {
-        success(res, "Reservation was canceled successfully.", 200)
+        activityLog(UserId, 'CANCELED_RESERVATION');
+        success(res, "Reservation was canceled successfully.", 200);
     } else {
       error(
           req, res,
