@@ -10,7 +10,7 @@ const token = await generateJWT('1');
 
 
 describe('Update User information', () => {
-    test('PUT /api/user/:id', async () => {
+    test('PUT /api/user/:id --> user details' , async () => {
         const { status, headers, body } = await request(app)
         .put('/api/users/1')
         .set('x-token', token)
@@ -35,5 +35,22 @@ describe('Update User information', () => {
             })
         )
     }) 
+
+    test('PUT /api/user/:id --> user not found', async () => {
+        const { status, body } = await request(app)
+        .put('/api/users/9999999')
+        .set('x-token', token)
+        .send({
+            name: 'Jose Luis',
+            email: 'jose@gmail.com',
+            phone: '76845672'
+        })
+
+        expect(status).toEqual(400)
+        expect(body.data).toEqual(
+            expect.stringContaining("User was not found")
+        )
+
+    })
 })
 
