@@ -63,6 +63,18 @@ export const createReservation = async (req, res) => {
     };
 };
 
+export const findReservationByPk = async( req, res) => {
+
+  const { id } = req.params;
+
+  try {
+    const reservation = await Reservation.findByPk(id);
+    success(res, reservation, 200);
+  } catch (err) {
+    error(res, err, 500);
+  }
+}
+
 export const cancelReservation = async ( req, res ) => {
 
   const { id: UserId } = req.user;
