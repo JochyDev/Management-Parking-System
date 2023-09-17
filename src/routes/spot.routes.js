@@ -1,10 +1,12 @@
 import { Router } from 'express';
-import { createOneSpot, createMultipleSpots } from '../controllers/index.js';
-
+import { createMultipleSpots } from '../controllers/index.js';
+import { validateJWT, validateFields, hasRole } from '../middlewares/index.js'
 const router = Router();
 
-router.post('/', createOneSpot);
-
-router.post('/:numSpots', createMultipleSpots);
+router.post('/:numSpots', [
+    validateJWT,
+    hasRole('admin'),
+    validateFields
+], createMultipleSpots);
 
 export default router;

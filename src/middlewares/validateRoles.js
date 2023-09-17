@@ -1,4 +1,4 @@
-import { success, error } from "../helpers/handleResponse.js"
+import { error } from "../helpers/handleResponse.js"
 
 export const hasRole = (...roles) => {
 
