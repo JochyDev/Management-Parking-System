@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { check } from 'express-validator';
 import { findReservationByPk, createReservation, cancelReservation, getCurrentOccupancy} from '../controllers/index.js';
-import { validateJWT, validateFields, hasRole } from '../middlewares/index.js';
+import { validateJWT, validateFields, hasRole, validateOwner } from '../middlewares/index.js';
 
 const router = Router();
 
@@ -25,6 +25,7 @@ router.post('/', [
 
 router.patch('/:id', [
     validateJWT,
+    validateOwner,
     validateFields
 ], cancelReservation);
 
