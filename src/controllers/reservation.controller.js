@@ -7,15 +7,15 @@ const { Reservation, Spot } = db;
 export const createReservation = async (req, res) => {
   
   const { id: UserId } = req.user;
-  const {startDateTime, endDateTime} = req.body;
+  const {startDateTime, endDateTime, carDetails} = req.body;
 
 
   const totalSpots = await Spot.count();
   let SpotId = null;
 
-  for(let i = 1; i < totalSpots; i++){
+  for(let i = 1; i <= totalSpots; i++){
       const spot = await Spot.findOne({
-        where: {id: i}
+        where: {spotNumber: i}
       })
 
       SpotId = spot.id;
@@ -53,7 +53,8 @@ export const createReservation = async (req, res) => {
           UserId,
           SpotId,
           startDateTime,
-          endDateTime
+          endDateTime,
+          carDetails
       });
 
       activityLog(UserId, 'PARKING_RESERVATION');

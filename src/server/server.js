@@ -4,8 +4,10 @@ import { db } from "../models/index.js";
 
 import { mongodbConection } from '../config/mongodb.config.js';
 
+import { createSpots } from '../helpers/setNumOfSpot.js'
+
 // Routes
-import { userRoutes, authRoutes, spotsRoutes, reservationRoutes, logsRoutes }  from '../routes/index.js';
+import { userRoutes, authRoutes, reservationRoutes, logsRoutes }  from '../routes/index.js';
 
 
 export class Server {
@@ -18,7 +20,6 @@ export class Server {
             logs: '/api/logs',
             reservations: '/api/reservations',
             users: '/api/users',
-            spots: '/api/spots',
         }
 
         // Conection to Mysql
@@ -30,8 +31,11 @@ export class Server {
         //Middlewares
         this.middlewares();
 
-        // Routas de mi aplicación
+        // Routes
         this.routes();
+
+        // Set number of sposts for parking
+        this.setNumOfSpots();
 
     }
 
@@ -60,7 +64,10 @@ export class Server {
         this.app.use(this.paths.logs, logsRoutes);
         this.app.use(this.paths.reservations, reservationRoutes);
         this.app.use(this.paths.users, userRoutes);
-        this.app.use(this.paths.spots, spotsRoutes);
+    }
+
+    async setNumOfSpots(){
+        await createSpots();
     }
     
     listen(){
