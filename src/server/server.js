@@ -1,9 +1,8 @@
 import express from 'express';
 import cors from 'cors';
+
 import { db } from "../models/sequelize/index.js";
-
 import { mongodbConection } from '../config/mongodb.config.js';
-
 import { createSpots } from '../helpers/setNumOfSpot.js'
 
 // Routes
@@ -34,7 +33,7 @@ export class Server {
         // Routes
         this.routes();
 
-        // Set number of sposts for parking
+        // Set number of Parking Sposts
         this.setNumOfSpots();
 
     }
