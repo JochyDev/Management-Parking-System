@@ -2,7 +2,7 @@ import { Log } from '../models/mongoose/log.model.js';
 import { db } from '../models/sequelize/index.js';
 const { User } = db;
 
-export const activityLog = async (userId, action) => {
+export const logActivity = async (userId, action) => {
 
     try {
         const log = await Log.create({userId, action});

@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { check } from 'express-validator';
 import { getUsers, createUser, updateUser, deleteUser } from '../controllers/index.js';
 import { validateJWT, validateFields, hasRole } from '../middlewares/index.js'
-import { emailExist } from '../helpers/db-validators.js'
+import { emailExist, userDoesntExist } from '../helpers/db-validators.js'
 
 const router = Router();
 
@@ -24,6 +24,7 @@ router.post('/', [
 
 router.put('/:id', [
     validateJWT,
+    check('id').custom(userDoesntExist),
     hasRole('ADMIN'),
     validateFields
 ], updateUser);

@@ -1,6 +1,6 @@
 import { DATE, Op } from 'sequelize';
 import { error, success } from '../helpers/handleResponse.js';
-import { activityLog } from '../helpers/activityLog.js';
+import { logActivity } from '../helpers/logActivity.js';
 import { db } from '../models/sequelize/index.js';
 const { Reservation, Spot } = db;
 
@@ -77,7 +77,7 @@ export const createReservation = async (req, res) => {
           carDetails
       });
 
-      activityLog(UserId, 'PARKING_RESERVATION');
+      logActivity(UserId, 'PARKING_RESERVATION');
       success( res, reservation, 200);
     } catch(err) {
         error(res, err, 500);
@@ -89,35 +89,40 @@ export const checkInOut = async (req, res) => {
   const {id: UserId} = req.user;
   const { id, action } = req.params;
 
-  let status;
-  let log;
+  // This is an object that maps the actions to the corresponding status and log
+  const actionMap = {
+    entry: {
+      status: 'IN_PROGRESS',
+      log: 'VEHICLE_ENTRY',
+    },
+    exit: {
+      status: 'COMPLETED',
+      log: 'VEHICLE_EXIT',
+    }
+  };
+  
+  // Check if the specified action is in the map
+  if (!actionMap[action]) {
+    return error(res, 'Action isn\'t valid', 400);
+  }
+  const reservation = await Reservation.findByPk(id);
 
-  switch (action){
-    case 'entry':
-      status = 'IN_PROGRESS';
-      log = 'VEHICLE_ENTRY';
-      break;
-    case 'exit':
-      status = 'COMPLETED';
-      log = 'VEHICLE_EXIT';
-      break;
-    default:
-      return error(res, 'Action isn\'t valid', 400);  
+  if(!reservation){
+    error(res, `Reservation was not found with id=${id}`, 404);
   }
 
-  const reservation = await Reservation.findByPk(id);
+  // Obtains the status and log corresponding to the action
+  const { status, log } = actionMap[action];
 
   reservation.status = status;
 
   try {
-    reservation.save();
-    activityLog(UserId, log);
+    await reservation.save();
+    logActivity(UserId, log);
     success(res, `The action ${action} was executed successfully`, 200);
   } catch (err) {
     error(res, err, 500);
   }
-
-
 }
 
 export const cancelReservation = async ( req, res ) => {
@@ -140,7 +145,7 @@ export const cancelReservation = async ( req, res ) => {
   try {
 
     await reservation.save()
-    activityLog(UserId, 'CANCELED_RESERVATION');
+    logActivity(UserId, 'CANCELED_RESERVATION');
     success(res, "Reservation was canceled successfully.", 200);
 
   } catch (err) {
