@@ -1,11 +1,11 @@
 import authRoutes from './auth.routes.js';
-import spotsRoutes from './spot.routes.js'; 
-import userRoutes from './user.routes.js'; 
+import logsRoutes from './log.routes.js'
 import reservationRoutes from './reservation.routes.js'; 
+import userRoutes from './user.routes.js'; 
 
 export {
     authRoutes,
-    spotsRoutes,
+    logsRoutes,
+    reservationRoutes,
     userRoutes,
-    reservationRoutes
 }

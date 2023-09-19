@@ -10,9 +10,14 @@ export const createModel = (sequelize, {Model, DataTypes}) => {
 
     Spot.init({
         id: {
+            type: DataTypes.UUID,
+            allowNull: false,
+            defaultValue: DataTypes.UUIDV4,
+            primaryKey: true
+        },
+        spotNumber: {
             type: DataTypes.INTEGER,
-            primaryKey: true,
-            autoIncrement: true,
+            allowNull: false
         }
     }, {
         sequelize,

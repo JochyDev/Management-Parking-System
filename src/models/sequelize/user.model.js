@@ -10,9 +10,10 @@ export const createModel = (sequelize, {Model, DataTypes}) => {
 
     User.init({
         id: {
-            type: DataTypes.INTEGER,
-            primaryKey: true,
-            autoIncrement: true,
+            type: DataTypes.UUID,
+            allowNull: false,
+            defaultValue: DataTypes.UUIDV4,
+            primaryKey: true
         },
         name: {
             type: DataTypes.STRING(20),

@@ -1,5 +1,5 @@
 import Sequelize from "sequelize";
-import config from "../config/db.config.json" assert {type: 'json'};
+import config from "../../config/db.config.json" assert {type: 'json'};
 
 import fs from 'fs';
 import { fileURLToPath } from 'url';

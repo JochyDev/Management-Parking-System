@@ -1,5 +1,5 @@
-import { Log } from '../mongooseModels/log.model.js';
-import { db } from '../models/index.js';
+import { Log } from '../models/mongoose/log.model.js';
+import { db } from '../models/sequelize/index.js';
 const { User } = db;
 
 export const activityLog = async (userId, action) => {

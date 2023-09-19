@@ -1,23 +1,33 @@
 import { Op } from 'sequelize';
 import { error, success } from '../helpers/handleResponse.js';
 import { activityLog } from '../helpers/activityLog.js';
-import { db } from '../models/index.js';
+import { db } from '../models/sequelize/index.js';
 const { Reservation, Spot } = db;
 
+export const findReservationByPk = async( req, res) => {
 
+  const { id } = req.params;
+
+  try {
+    const reservation = await Reservation.findByPk(id);
+    success(res, reservation, 200);
+  } catch (err) {
+    error(res, err, 500);
+  }
+}
 
 export const createReservation = async (req, res) => {
   
   const { id: UserId } = req.user;
-  const {startDateTime, endDateTime} = req.body;
+  const {startDateTime, endDateTime, carDetails} = req.body;
 
 
   const totalSpots = await Spot.count();
   let SpotId = null;
 
-  for(let i = 1; i < totalSpots; i++){
+  for(let i = 1; i <= totalSpots; i++){
       const spot = await Spot.findOne({
-        where: {id: i}
+        where: {spotNumber: i}
       })
 
       SpotId = spot.id;
@@ -55,33 +65,76 @@ export const createReservation = async (req, res) => {
           UserId,
           SpotId,
           startDateTime,
-          endDateTime
+          endDateTime,
+          carDetails
       });
 
-      activityLog('1', 'PARKING_RESERVATION');
+      activityLog(UserId, 'PARKING_RESERVATION');
       success( res, reservation, 200);
     } catch(err) {
         error(res, err, 500);
     };
 };
 
-export const cancelReservation = async ( req, res ) => {
+export const checkInOut = async (req, res) => {
+  
+  const {id: UserId} = req.user;
+  const { id, action } = req.params;
 
-  const { id } = req.params;
+  let status;
+  let log;
+
+  switch (action){
+    case 'entry':
+      status = 'IN_PROGRESS';
+      log = 'VEHICLE_ENTRY';
+      break;
+    case 'exit':
+      status = 'COMPLETED';
+      log = 'VEHICLE_EXIT';
+      break;
+    default:
+      return error(res, 'Action isn\'t valid', 400);  
+  }
+
+  const reservation = await Reservation.findByPk(id);
+
+  reservation.status = status;
 
   try {
-    const num = await Reservation.update({status: 'CANCELED'}, {
-      where: {id}
-    });
- 
-    if (num == 1) {
-        success(res, "Reservation was canceled successfully.", 200)
-    } else {
-      error(
-          req, res,
-          `Cannot cancel reservation with id=${id}. Maybe Reservation was not found`
-      );
-    } 
+    reservation.save();
+    activityLog(UserId, log);
+    success(res, `The action ${action} was executed successfully`, 200);
+  } catch (err) {
+    error(res, err, 500);
+  }
+
+
+}
+
+export const cancelReservation = async ( req, res ) => {
+
+  const { id: UserId } = req.user;
+  const { id } = req.params;
+
+  const reservation = await Reservation.findByPk(id);
+
+  if(!reservation){
+    error(res, `Reservation was not found with id=${id}`, 404);
+  }
+
+  if( reservation.status == 'IN_PROGRESS'){
+    return error(res, `The reservation has already started, it cannot be canceled`, 400);
+  }
+
+  reservation.status = 'CANCELED'
+
+  try {
+
+    await reservation.save()
+    activityLog(UserId, 'CANCELED_RESERVATION');
+    success(res, "Reservation was canceled successfully.", 200);
+
   } catch (err) {
     error(res, err, 500);
   }
