@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { success, error } from '../helpers/handleResponse.js';
+import { error } from '../helpers/handleResponse.js';
 import { db } from '../models/sequelize/index.js';
 const { User } = db;
 
