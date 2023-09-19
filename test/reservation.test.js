@@ -12,8 +12,8 @@ describe('Reserve a Parking Spot', () => {
         .post('/api/reservations')
         .set('x-token', token)
         .send({
-            startDateTime: new Date(), 
-            endDateTime: new Date(),
+            startDateTime: new Date('2025', '10', '01'), 
+            endDateTime: new Date('2025', '10', '02'),
             carDetails: {
                 "brand": "toyota",
                 "modelo": "corolla-2006",
@@ -44,6 +44,65 @@ describe('Reserve a Parking Spot', () => {
 
         expect(status).toEqual(400),
         expect(body.data.errors).toBeTruthy();
+    })
+
+    test('POST /api/reservations --> 401 Unauthorized', async () => {
+        const {status, body} = await request(server.app)
+        .post('/api/reservations')
+        .send({
+            startDateTime: new Date(), 
+            endDateTime: new Date(),
+            carDetails: {
+                "brand": "toyota",
+                "modelo": "corolla-2006",
+                "chapa": "pkg5467"
+            }
+        })
+
+        expect(status).toEqual(401),
+        expect(body.data).toEqual(
+            expect.stringContaining("There isn't token")
+        )
+    })
+
+    test('POST /api/reservations --> Reservation in past', async () => {
+        const {status, body} = await request(server.app)
+        .post('/api/reservations')
+        .set('x-token', token)
+        .send({
+            startDateTime: new Date('2020'), 
+            endDateTime: new Date(),
+            carDetails: {
+                "brand": "toyota",
+                "modelo": "corolla-2006",
+                "chapa": "pkg5467"
+            }
+        })
+
+        expect(status).toEqual(400),
+        expect(body.data).toEqual(
+            expect.stringContaining("Cannot create a reservation in past")
+        )
+    })
+
+    test('POST /api/reservations --> endDateTime always have to be after startDateTime', async () => {
+        const {status, body} = await request(server.app)
+        .post('/api/reservations')
+        .set('x-token', token)
+        .send({
+            startDateTime: new Date('2025'), 
+            endDateTime: new Date('2024'),
+            carDetails: {
+                "brand": "toyota",
+                "modelo": "corolla-2006",
+                "chapa": "pkg5467"
+            }
+        })
+
+        expect(status).toEqual(400),
+        expect(body.data).toEqual(
+            expect.stringContaining('endDateTime always have to be after startDateTime')
+        )
     })
 })
 
