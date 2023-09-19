@@ -2,7 +2,7 @@ import bcryptjs from 'bcryptjs';
 
 import generateJWT from '../helpers/generateJWT.js';
 import { success, error } from "../helpers/handleResponse.js";
-import { db } from '../models/index.js';
+import { db } from '../models/sequelize/index.js';
 const { User} = db;
 
 export const login = async (req, res) => {

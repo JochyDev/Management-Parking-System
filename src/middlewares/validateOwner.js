@@ -1,5 +1,5 @@
 
-import { db } from '../models/index.js'
+import { db } from '../models/sequelize/index.js'
 const { Reservation, User } = db;
 import { error } from '../helpers/handleResponse.js'
 

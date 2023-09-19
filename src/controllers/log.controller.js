@@ -1,5 +1,5 @@
 import { success, error } from '../helpers/handleResponse.js';
-import { Log } from '../mongooseModels/log.model.js';
+import { Log } from '../models/mongoose/log.model.js';
 
 export const getActivityLogs = async (req, res) => {
 

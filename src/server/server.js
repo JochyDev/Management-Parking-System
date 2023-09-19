@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import { db } from "../models/index.js";
+import { db } from "../models/sequelize/index.js";
 
 import { mongodbConection } from '../config/mongodb.config.js';
 

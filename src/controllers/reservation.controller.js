@@ -1,7 +1,7 @@
 import { Op } from 'sequelize';
 import { error, success } from '../helpers/handleResponse.js';
 import { activityLog } from '../helpers/activityLog.js';
-import { db } from '../models/index.js';
+import { db } from '../models/sequelize/index.js';
 const { Reservation, Spot } = db;
 
 export const findReservationByPk = async( req, res) => {
