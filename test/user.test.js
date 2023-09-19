@@ -3,14 +3,32 @@ import request from 'supertest';
 import { Server } from '../src/server/server.js';
 const server = new Server();
 
-import generateJWT from '../src/helpers/generateJWT.js';
-const token = await generateJWT('3c20f41b-ba91-42a9-afcb-c32df561636d');
+import { db} from '../src/models/sequelize/index.js';
+const { User, sequelize } = db;
 
+import generateJWT from '../src/helpers/generateJWT.js';
+let user;
+let token; 
 
 describe('Update User information', () => {
+
+    beforeAll( async () => {
+        await sequelize.sync({force: true})
+        
+        user = await User.create({
+            name: 'Juan',
+            email: 'juan@gmail.com',
+            password : '1234',
+            phone: '5678',
+            role: 'ADMIN'
+        });
+
+        token = await generateJWT(user.id);
+    })
+
     test('PUT /api/user/:id --> user details' , async () => {
         const { status, headers, body } = await request(server.app)
-        .put('/api/users/3c20f41b-ba91-42a9-afcb-c32df561636d')
+        .put(`/api/users/${user.id}`)
         .set('x-token', token)
         .send({
             name: 'Jose Luis',
@@ -24,7 +42,7 @@ describe('Update User information', () => {
         )
         expect(body.data).toEqual(
             expect.objectContaining({
-                id: '3c20f41b-ba91-42a9-afcb-c32df561636d',
+                id: user.id,
                 name: 'Jose Luis', 
                 email: 'jose@gmail.com',
                 phone: '76845672',
@@ -49,6 +67,10 @@ describe('Update User information', () => {
             expect.stringContaining("Cannot update User with")
         )
 
+    })
+
+    afterAll( async () => {
+        await sequelize.close();
     })
 })
 

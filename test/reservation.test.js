@@ -3,17 +3,41 @@ import request from 'supertest';
 import { Server } from '../src/server/server.js';
 const server = new Server();
 
+import { db} from '../src/models/sequelize/index.js';
+const { User, sequelize } = db;
+
+
 import generateJWT from '../src/helpers/generateJWT.js';
-const token = await generateJWT('3c20f41b-ba91-42a9-afcb-c32df561636d');
+let user;
+let token;
+
+import { createSpots } from '../src/helpers/setNumOfSpot.js'
+
+beforeAll( async () => {
+    await sequelize.sync({force: true});
+    await createSpots();
+
+    user = await User.create({
+        name: 'Juan',
+        email: 'juan@gmail.com',
+        password : '1234',
+        phone: '5678',
+        role: 'ADMIN'
+    });
+
+    token = await generateJWT(user.id);
+    console.log(token)
+})
 
 describe('Reserve a Parking Spot', () => {
+
     test('POST /api/reservation --> reservation details', async () => {
         const {status, headers, body} = await request(server.app)
         .post('/api/reservations')
         .set('x-token', token)
         .send({
-            startDateTime: new Date('2025', '10', '01'), 
-            endDateTime: new Date('2025', '10', '02'),
+            startDateTime: new Date('2025'), 
+            endDateTime: new Date('2025'),
             carDetails: {
                 "brand": "toyota",
                 "modelo": "corolla-2006",
@@ -125,5 +149,8 @@ describe('Get currect occupancy of Parking', () => {
     })
 })
 
+afterAll( async () => {
+    await sequelize.close();
+})
 
 
