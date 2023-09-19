@@ -1,17 +1,16 @@
-import request from 'supertest';
 import 'dotenv/config';
-
+import request from 'supertest';
 import { Server } from '../src/server/server.js';
 const server = new Server();
 
 import generateJWT from '../src/helpers/generateJWT.js';
-const token = await generateJWT('1');
+const token = await generateJWT('3c20f41b-ba91-42a9-afcb-c32df561636d');
 
 
 describe('Update User information', () => {
     test('PUT /api/user/:id --> user details' , async () => {
         const { status, headers, body } = await request(server.app)
-        .put('/api/users/1')
+        .put('/api/users/3c20f41b-ba91-42a9-afcb-c32df561636d')
         .set('x-token', token)
         .send({
             name: 'Jose Luis',
@@ -25,7 +24,7 @@ describe('Update User information', () => {
         )
         expect(body.data).toEqual(
             expect.objectContaining({
-                id: 1,
+                id: '3c20f41b-ba91-42a9-afcb-c32df561636d',
                 name: 'Jose Luis', 
                 email: 'jose@gmail.com',
                 phone: '76845672',
@@ -47,7 +46,7 @@ describe('Update User information', () => {
 
         expect(status).toEqual(400)
         expect(body.data).toEqual(
-            expect.stringContaining("User was not found")
+            expect.stringContaining("Cannot update User with")
         )
 
     })

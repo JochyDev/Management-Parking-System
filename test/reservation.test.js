@@ -1,11 +1,10 @@
-import request from 'supertest';
 import 'dotenv/config';
-
+import request from 'supertest';
 import { Server } from '../src/server/server.js';
 const server = new Server();
 
 import generateJWT from '../src/helpers/generateJWT.js';
-const token = await generateJWT('1');
+const token = await generateJWT('3c20f41b-ba91-42a9-afcb-c32df561636d');
 
 describe('Reserve a Parking Spot', () => {
     test('POST /api/reservation --> reservation details', async () => {
@@ -14,7 +13,12 @@ describe('Reserve a Parking Spot', () => {
         .set('x-token', token)
         .send({
             startDateTime: new Date(), 
-            endDateTime: new Date() 
+            endDateTime: new Date(),
+            carDetails: {
+                "brand": "toyota",
+                "modelo": "corolla-2006",
+                "chapa": "pkg5467"
+            }
         });
         
         expect(status).toEqual(200);
@@ -22,12 +26,13 @@ describe('Reserve a Parking Spot', () => {
             expect.stringContaining('json')
         )
         expect(body.data).toEqual(expect.objectContaining({
-            id: expect.any(Number),
+            id: expect.any(String),
             startDateTime: expect.any(String), 
             endDateTime: expect.any(String),
+            carDetails: expect.any(Object),
             status: expect.any(String),
-            SpotId: expect.any(Number),
-            UserId: expect.any(Number)
+            SpotId: expect.any(String),
+            UserId: expect.any(String)
           }));
     })
 
