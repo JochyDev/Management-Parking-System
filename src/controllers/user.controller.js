@@ -51,12 +51,6 @@ export const updateUser = async ( req, res ) => {
     
     const { id: _id, password, ...data } = req.body;
 
-    const user = await User.findByPk(id);
-
-    if(!user){
-        return error(res, `Cannot update User with id=${id}`, 400);
-    }
-
     try {
         await User.update(data, {
             where: { id }
