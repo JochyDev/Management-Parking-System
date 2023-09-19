@@ -4,6 +4,18 @@ import { activityLog } from '../helpers/activityLog.js';
 import { db } from '../models/index.js';
 const { Reservation, Spot } = db;
 
+export const findReservationByPk = async( req, res) => {
+
+  const { id } = req.params;
+
+  try {
+    const reservation = await Reservation.findByPk(id);
+    success(res, reservation, 200);
+  } catch (err) {
+    error(res, err, 500);
+  }
+}
+
 export const createReservation = async (req, res) => {
   
   const { id: UserId } = req.user;
@@ -64,16 +76,38 @@ export const createReservation = async (req, res) => {
     };
 };
 
-export const findReservationByPk = async( req, res) => {
+export const checkInOut = async (req, res) => {
+  
+  const {id: UserId} = req.user;
+  const { id, action } = req.params;
 
-  const { id } = req.params;
+  let status;
+  let log;
+
+  switch (action){
+    case 'entry':
+      status = 'IN_PROGRESS';
+      log = 'VEHICLE_ENTRY';
+    case 'exit':
+      status = 'COMPLETED';
+      log = 'VEHICLE_EXIT';
+    default:
+      error(res, 'Action isn\'t valid', 400);  
+  }
+
+  const reservation = await Reservation.findOne(id);
+
+  reservation.status = status;
 
   try {
-    const reservation = await Reservation.findByPk(id);
-    success(res, reservation, 200);
+    reservation.save();
+    activityLog(UserId, log);
+    success(res, `The action ${action} was executed successfully`, 200);
   } catch (err) {
     error(res, err, 500);
   }
+
+
 }
 
 export const cancelReservation = async ( req, res ) => {

@@ -1,7 +1,14 @@
 import { Router } from 'express';
 import { check } from 'express-validator';
-import { findReservationByPk, createReservation, cancelReservation, getCurrentOccupancy} from '../controllers/index.js';
 import { validateJWT, validateFields, hasRole, validateOwner } from '../middlewares/index.js';
+import { 
+    findReservationByPk, 
+    createReservation, 
+    cancelReservation, 
+    getCurrentOccupancy, 
+    checkInOut
+} from '../controllers/index.js';
+
 
 const router = Router();
 
@@ -28,6 +35,12 @@ router.patch('/:id', [
     validateOwner,
     validateFields
 ], cancelReservation);
+
+router.patch('/:action/:id', [
+    validateJWT,
+    hasRole('ADMIN', 'CLIENT'),
+    validateFields
+], checkInOut);
 
 
 export default router;
