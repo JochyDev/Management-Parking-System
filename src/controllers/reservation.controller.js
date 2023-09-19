@@ -1,4 +1,4 @@
-import { Op } from 'sequelize';
+import { DATE, Op } from 'sequelize';
 import { error, success } from '../helpers/handleResponse.js';
 import { activityLog } from '../helpers/activityLog.js';
 import { db } from '../models/sequelize/index.js';
@@ -20,6 +20,14 @@ export const createReservation = async (req, res) => {
   
   const { id: UserId } = req.user;
   const {startDateTime, endDateTime, carDetails} = req.body;
+
+  if(new Date(startDateTime) < new Date()){
+    return error(res, `Cannot create a reservation in past`, 400);
+  }
+
+  if(new Date(endDateTime) < new Date(startDateTime)){
+    return error(res, `endDateTime always have to be after startDateTime`, 400);
+  }
 
 
   const totalSpots = await Spot.count();
