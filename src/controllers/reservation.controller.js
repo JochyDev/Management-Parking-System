@@ -88,14 +88,16 @@ export const checkInOut = async (req, res) => {
     case 'entry':
       status = 'IN_PROGRESS';
       log = 'VEHICLE_ENTRY';
+      break;
     case 'exit':
       status = 'COMPLETED';
       log = 'VEHICLE_EXIT';
+      break;
     default:
-      error(res, 'Action isn\'t valid', 400);  
+      return error(res, 'Action isn\'t valid', 400);  
   }
 
-  const reservation = await Reservation.findOne(id);
+  const reservation = await Reservation.findByPk(id);
 
   reservation.status = status;
 
