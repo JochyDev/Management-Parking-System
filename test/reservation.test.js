@@ -3,14 +3,13 @@ import 'dotenv/config';
 
 import { Server } from '../src/server/server.js';
 const server = new Server();
-const app = server.app;
 
 import generateJWT from '../src/helpers/generateJWT.js';
 const token = await generateJWT('1');
 
 describe('Reserve a Parking Spot', () => {
     test('POST /api/reservation --> reservation details', async () => {
-        const {status, headers, body} = await request(app)
+        const {status, headers, body} = await request(server.app)
         .post('/api/reservations')
         .set('x-token', token)
         .send({
@@ -33,7 +32,7 @@ describe('Reserve a Parking Spot', () => {
     })
 
     test('POST /api/reservations --> startDatetime and endDateTime are requireds!!!', async () => {
-        const {status, body} = await request(app)
+        const {status, body} = await request(server.app)
         .post('/api/reservations')
         .set('x-token', token)
         .send({})
@@ -45,7 +44,7 @@ describe('Reserve a Parking Spot', () => {
 
 describe('Get currect occupancy of Parking', () => {
     test('GET /api/reservations --> occupancy details', async () => {
-        const {status, body } = await request(app)
+        const {status, body } = await request(server.app)
         .get('/api/reservations')
         .set('x-token', token);
 

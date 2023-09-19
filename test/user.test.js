@@ -3,7 +3,6 @@ import 'dotenv/config';
 
 import { Server } from '../src/server/server.js';
 const server = new Server();
-const app = server.app;
 
 import generateJWT from '../src/helpers/generateJWT.js';
 const token = await generateJWT('1');
@@ -11,7 +10,7 @@ const token = await generateJWT('1');
 
 describe('Update User information', () => {
     test('PUT /api/user/:id --> user details' , async () => {
-        const { status, headers, body } = await request(app)
+        const { status, headers, body } = await request(server.app)
         .put('/api/users/1')
         .set('x-token', token)
         .send({
@@ -37,7 +36,7 @@ describe('Update User information', () => {
     }) 
 
     test('PUT /api/user/:id --> user not found', async () => {
-        const { status, body } = await request(app)
+        const { status, body } = await request(server.app)
         .put('/api/users/9999999')
         .set('x-token', token)
         .send({
