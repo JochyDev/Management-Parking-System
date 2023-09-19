@@ -81,20 +81,24 @@ export const cancelReservation = async ( req, res ) => {
   const { id: UserId } = req.user;
   const { id } = req.params;
 
+  const reservation = await Reservation.findByPk(id);
+
+  if(!reservation){
+    error(res, `Reservation was not found with id=${id}`, 404);
+  }
+
+  if( reservation.status == 'IN_PROGRESS'){
+    return error(res, `The reservation has already started, it cannot be canceled`, 400);
+  }
+
+  reservation.status = 'CANCELED'
+
   try {
-    const num = await Reservation.update({status: 'CANCELED'}, {
-      where: {id}
-    });
- 
-    if (num == 1) {
-        activityLog(UserId, 'CANCELED_RESERVATION');
-        success(res, "Reservation was canceled successfully.", 200);
-    } else {
-      error(
-          req, res,
-          `Cannot cancel reservation with id=${id}. Maybe Reservation was not found`
-      );
-    } 
+
+    await reservation.save()
+    activityLog(UserId, 'CANCELED_RESERVATION');
+    success(res, "Reservation was canceled successfully.", 200);
+
   } catch (err) {
     error(res, err, 500);
   }

@@ -29,7 +29,7 @@ export const createModel = (sequelize, {Model, DataTypes}) => {
           allowNull: false
         },
         status: {
-          type: DataTypes.ENUM('ACTIVE', 'COMPLETED', 'CANCELED'), 
+          type: DataTypes.ENUM('ACTIVE', 'IN_PROGRESS', 'COMPLETED', 'CANCELED'), 
           defaultValue: 'ACTIVE'
         },
       }, {
