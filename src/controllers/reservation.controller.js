@@ -1,4 +1,4 @@
-import { DATE, Op } from 'sequelize';
+import { Op } from 'sequelize';
 import { error, success } from '../helpers/handleResponse.js';
 import { logActivity } from '../helpers/logActivity.js';
 import { db } from '../models/sequelize/index.js';

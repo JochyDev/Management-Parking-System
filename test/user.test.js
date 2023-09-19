@@ -63,8 +63,9 @@ describe('Update User information', () => {
         })
 
         expect(status).toEqual(400)
-        expect(body.data).toEqual(
-            expect.stringContaining("Cannot update User with")
+        expect(body.data.errors).toBeTruthy()
+        expect(body.data.errors[0].msg).toEqual(
+            expect.stringContaining("User with id=9999999 dosen't exist!")
         )
 
     })
