@@ -7,7 +7,8 @@
     "start": "node src/index",
     "start:dev": "node --watch src/index",
     "test": "node --experimental-vm-modules ./node_modules/.bin/jest  --verbose --silent --detectOpenHandles", 
-    "test:watch": "npm run test -- --watchAll"
+    "test:watch": "npm run test -- --watchAll",
+    "test:coverage": "npm run test -- --coverage"
   },
   "type": "module",
   "keywords": [
