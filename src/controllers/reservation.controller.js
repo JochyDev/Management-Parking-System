@@ -9,18 +9,21 @@ export const createReservation = async (req, res) => {
   const { id: UserId } = req.user;
   const {startDateTime, endDateTime, carDetails} = req.body;
 
+  // Check if the startDateTime is in the past.
   if(new Date(startDateTime) < new Date()){
     return error(res, `Cannot create a reservation in past`, 400);
   }
 
+  // Check if endDateTime is before startDateTime.
   if(new Date(endDateTime) < new Date(startDateTime)){
     return error(res, `endDateTime always have to be after startDateTime`, 400);
   }
 
-
+  // Get the total number of spots available.
   const totalSpots = await Spot.count();
   let SpotId = null;
 
+  // Loop through available spots to find one without overlapping reservations.
   for(let i = 1; i <= totalSpots; i++){
       const spot = await Spot.findOne({
         where: {spotNumber: i}
@@ -28,6 +31,7 @@ export const createReservation = async (req, res) => {
 
       SpotId = spot.id;
 
+      // Check if there is an overlapping reservation for this spot.
       const overlappingReservation = await Reservation.findOne({
         where: {
           SpotId,
@@ -44,11 +48,13 @@ export const createReservation = async (req, res) => {
         },
       });
 
+      // If there's an overlap, reset SpotId and continue to the next spot.
       if (overlappingReservation) {
         SpotId = null;
         continue;
       }
-
+      
+      // Break the loop if a spot without overlapping reservations is found.
       break;
   };
 
@@ -64,7 +70,8 @@ export const createReservation = async (req, res) => {
           endDateTime,
           carDetails
       });
-
+        
+      // Break the loop if a spot without overlapping reservations is found.
       logActivity(UserId, 'PARKING_RESERVATION');
       success( res, reservation, 200);
     } catch(err) {
@@ -96,7 +103,7 @@ export const checkInOut = async (req, res) => {
   const reservation = await Reservation.findByPk(id);
 
   if(!reservation){
-    error(res, `Reservation was not found with id=${id}`, 404);
+    return error(res, `Reservation was not found with id=${id}`, 404);
   }
 
   // Obtains the status and log corresponding to the action
