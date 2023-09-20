@@ -43,6 +43,7 @@ Run the following command to start the server:
    ```
    npm start
    ```
+Once the server is executed, go to the ```./src/server/server.js``` file within the connectionToMysql method, change the force property to ```false```
 
 ### API Endpoints
 1. Reserve a Parking Spot: 
