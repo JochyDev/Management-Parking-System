@@ -24,7 +24,6 @@ beforeAll( async () => {
     });
 
     token = await generateJWT(user.id);
-    console.log(token)
 })
 
 describe('Access the parking logs', () => {
@@ -51,4 +50,16 @@ describe('Access the parking logs', () => {
             ])
         ) 
     })
+
+    test('debe manejar errores correctamente', async () => {
+        // Simula un error pasando un valor incorrecto para 'offset'
+        const {status, body } = await request(server.app)
+        .get('/api/logs?offset=a')
+        .set('x-token', token);
+
+        expect(status).toBe(500); 
+        expect(body.data.message).toEqual(
+            expect.stringContaining('Cast to Number failed for value "a"')
+        ); 
+    });  
 })
