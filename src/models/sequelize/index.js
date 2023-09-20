@@ -5,7 +5,7 @@ import { dirname, basename, join} from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const __basename = basename(__filename);
-import config from "../../config/db.config.json" assert {type: 'json'};
+import { config } from "../../config/db.config.js" ;
 
 
 const env = process.env.NODE_ENV || 'development';
