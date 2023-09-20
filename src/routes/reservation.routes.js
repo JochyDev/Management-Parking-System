@@ -1,8 +1,7 @@
 import { Router } from 'express';
 import { check } from 'express-validator';
 import { validateJWT, validateFields, hasRole, validateOwner } from '../middlewares/index.js';
-import { 
-    findReservationByPk, 
+import {  
     createReservation, 
     cancelReservation, 
     getCurrentOccupancy, 
@@ -17,11 +16,6 @@ router.get('/', [
     hasRole('ADMIN', 'EMPLOYEE'),
     validateFields
 ], getCurrentOccupancy);
-
-router.get('/:id', [
-    validateJWT,
-    validateFields
-], findReservationByPk);
 
 router.post('/', [
     validateJWT,

@@ -4,18 +4,6 @@ import { logActivity } from '../helpers/logActivity.js';
 import { db } from '../models/sequelize/index.js';
 const { Reservation, Spot } = db;
 
-export const findReservationByPk = async( req, res) => {
-
-  const { id } = req.params;
-
-  try {
-    const reservation = await Reservation.findByPk(id);
-    success(res, reservation, 200);
-  } catch (err) {
-    error(res, err, 500);
-  }
-}
-
 export const createReservation = async (req, res) => {
   
   const { id: UserId } = req.user;
@@ -65,7 +53,7 @@ export const createReservation = async (req, res) => {
   };
 
   if(!SpotId){
-      return success(res, 'No hay plazas de aparcamiento disponibles en ese horario.', 401);
+      return error(res, 'No hay plazas de aparcamiento disponibles en ese horario.', 400);
   };
 
   try {

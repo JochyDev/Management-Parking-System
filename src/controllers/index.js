@@ -2,7 +2,6 @@ export { getUsers, createUser, updateUser, deleteUser } from './user.controller.
 export { login } from './auth.controller.js';
 export { getActivityLogs } from './log.controller.js'
 export { 
-    findReservationByPk, 
     createReservation, 
     cancelReservation, 
     getCurrentOccupancy,
