@@ -1,7 +1,7 @@
 import  bcryptjs  from "bcryptjs";
 
 import { db } from '../models/sequelize/index.js';
-const { User} = db;
+const { User } = db;
 
 export const getUsers = async(limit, offset) => {
     return await User.findAndCountAll(
@@ -13,7 +13,24 @@ export const getUsers = async(limit, offset) => {
 }
 
 export const getUserById = async( id ) => {
-    return await User.findByPk(id);
+    const user = await User.findByPk(id);
+
+    if(!user){
+        throw new Error(`User with id=${id} was not found. `)
+    }
+
+    return user;
+}
+
+export const getUserByEmail = async( email ) => {
+    const user = await User.findOne({
+        where: { email }
+    });
+
+    if(!user){
+        throw new Error(`User with email=${email} was not found.`)
+    }
+
 } 
 
 export const createUser = async( body ) => {
