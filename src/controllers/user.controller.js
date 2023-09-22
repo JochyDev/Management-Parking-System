@@ -39,7 +39,7 @@ export const updateUser = async ( req, res ) => {
         success(res, updatedUser, 200);
     
     } catch (err) {
-        error( res, `Error updating Tutorial with id=${id}`, 500 );   
+        error( res, `Error updating User with id=${id}`, 500 );   
     }
 
 }
