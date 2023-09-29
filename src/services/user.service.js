@@ -1,19 +1,12 @@
 import  bcryptjs  from "bcryptjs";
-
-import { db } from '../models/sequelize/index.js';
-const { User } = db;
+import { userRepository } from "../repositories/index.js";
 
 export const getUsers = async(limit, offset) => {
-    return await User.findAndCountAll(
-        { 
-            offset: parseInt(offset),
-            limit:  parseInt(limit)
-        }
-    );
+    return userRepository.getAllUsersAndCount(limit, offset);
 }
 
 export const getUserById = async( id ) => {
-    const user = await User.findByPk(id);
+    const user = await userRepository.getUserById(id)
 
     if(!user){
         throw new Error(`User with id=${id} was not found. `)
@@ -21,17 +14,6 @@ export const getUserById = async( id ) => {
 
     return user;
 }
-
-export const getUserByEmail = async( email ) => {
-    const user = await User.findOne({
-        where: { email }
-    });
-
-    if(!user){
-        throw new Error(`User with email=${email} was not found.`)
-    }
-
-} 
 
 export const createUser = async( body ) => {
 
@@ -48,21 +30,19 @@ export const createUser = async( body ) => {
         password: hash
     }
 
-    return await User.create(entity);
+    return await userRepository.createUser(entity);
 }
 
 export const updateUser = async( id, data ) => {
 
-    await User.update(data, {
-        where: { id }
-    });
+    await userRepository.updateUser(id, data)
 
-    return await getUserById(id);
+    return await userRepository.getUserById(id);
     
 }
 
 export const deleteUser = async( id ) => {
 
-    return await User.destroy({where: { id }});
+    return await userRepository.deleteUser(id);
     
 }

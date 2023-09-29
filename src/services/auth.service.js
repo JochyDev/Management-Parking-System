@@ -1,10 +1,14 @@
 import generateJWT from "../helpers/generateJWT.js";
-import { getUserByEmail } from "./user.service.js";
+import { userRepository } from "../repositories/index.js";
 
 
 export const login = async (email, password ) => {
 
-        const user = await getUserByEmail(email);
+        const user = await userRepository.getUserByEmail(email);
+
+        if(!user){
+            throw new Error(`User with email=${email} was not found.`)
+        }
 
         const validPassword = bcryptjs.compareSync(password, user.password);
 
