@@ -1,3 +1,5 @@
+import { Op } from 'sequelize';
+import { logActivity } from '../helpers/logActivity.js';
 import { db } from '../models/sequelize/index.js';
 const { Reservation, Spot } = db;
 
@@ -58,7 +60,7 @@ export const createReservation = async ( UserId, body ) => {
         throw new Error('No hay plazas de aparcamiento disponibles en ese horario.', 400);
     };
 
-    return await Reservation.create({
+    const reservation = await Reservation.create({
         UserId,
         SpotId,
         startDateTime,
@@ -66,5 +68,87 @@ export const createReservation = async ( UserId, body ) => {
         carDetails
     });
 
+    logActivity(UserId, 'PARKING_RESERVATION');
+    return reservation;
+
     
-}   
+}
+
+export const checkInOut = async ( UserId, id, action) => {
+  // This is an object that maps the actions to the corresponding status and log
+  const actionMap = {
+    entry: {
+      status: 'IN_PROGRESS',
+      log: 'VEHICLE_ENTRY',
+    },
+    exit: {
+      status: 'COMPLETED',
+      log: 'VEHICLE_EXIT',
+    }
+  };
+  
+  // Check if the specified action is in the map
+  if (!actionMap[action]) {
+    return error(res, 'Action isn\'t valid', 400);
+  }
+  const reservation = await Reservation.findByPk(id);
+
+  if(!reservation){
+    return error(res, `Reservation was not found with id=${id}`, 404);
+  }
+
+  // Obtains the status and log corresponding to the action
+  const { status, log } = actionMap[action];
+
+  reservation.status = status;
+
+  await reservation.save();
+  logActivity(UserId, log);
+}
+
+export const cancelReservation = async( UserId, id) => {
+  const reservation = await Reservation.findByPk(id);
+
+  if(!reservation){
+    error(res, `Reservation was not found with id=${id}`, 404);
+  }
+
+  if( reservation.status == 'IN_PROGRESS'){
+    return error(res, `The reservation has already started, it cannot be canceled`, 400);
+  }
+
+  reservation.status = 'CANCELED'
+
+  await reservation.save()
+  logActivity(UserId, 'CANCELED_RESERVATION');
+}
+
+export const getCurrentOccupancy = async () => {
+
+  const totalSpots = await Spot.count();
+
+  const parkingSpots = await Reservation.findAll({
+    where: {
+      status: 'ACTIVE',
+      [Op.and]: [
+        {
+          startDateTime: {
+            [Op.lt]: new Date(),
+          },
+          endDateTime: {
+            [Op.gt]: new Date(),
+          },
+        },
+      ],
+    },
+  })
+
+  const occupancyDetails = { 
+    totalSpots,
+    occupiedSpot: parkingSpots.length,
+    availableSpots: totalSpots - parkingSpots.length,
+    occupationPercentage: (parkingSpots.length / totalSpots)  * 100 + "%"
+  }
+
+  return occupancyDetails;
+}
