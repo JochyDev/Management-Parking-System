@@ -1,11 +1,6 @@
-import { Log } from '../models/mongoose/log.model.js';
+import { logRepository } from '../repositories/index.js';
 
 export const getActivityLogs = async ( limit, offset ) => {
     
-    return await Promise.all([
-        Log.countDocuments(),
-        Log.find()
-                .limit(limit)
-                .skip(offset)
-    ])
+    return await logRepository.getAllLogsAndCount(limit, offset);
 }
