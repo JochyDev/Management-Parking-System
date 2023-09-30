@@ -18,8 +18,7 @@ router.post('/', [
     check('phone', 'Phone Number is required').not().isEmpty(),
     check('email', 'Email isn\'t valid').isEmail(),
     check('email').custom( emailExist ),
-    check('role', 'It\'s not a valid role').isIn(['ADMIN', 'EMPLOYEE', 'CLIENT']),
-    
+    validateFields
 ], createUser);
 
 router.put('/:id', [

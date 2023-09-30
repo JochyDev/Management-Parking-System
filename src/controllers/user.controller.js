@@ -1,21 +1,15 @@
 
-import  bcryptjs  from "bcryptjs";
-import { success, error } from "../helpers/handleResponse.js";
-import { db } from '../models/sequelize/index.js';
-const { User} = db;
+import { error, success } from "../helpers/handleResponse.js";
+import { userService }  from '../services/index.js';
+
 
 export const getUsers = async (req, res) => {
     
     const { limit = 5, offset = 0 } = req.query;
 
     try {
-        const data = await User.findAndCountAll(
-            { 
-                offset: parseInt(offset),
-                limit:  parseInt(limit)
-            }
-        );
-        success(res, data, 200);
+        const users = await userService.getUsers(limit, offset);
+        success(res, users, 200);
     } catch (err) {
         error(res, err, 500);
     }
@@ -23,24 +17,13 @@ export const getUsers = async (req, res) => {
 
 export const createUser = async(req, res) => {
     
-    const { name, email, password, phone } = req.body;
-
-    // Encriptar la contraseña
-    const salt = bcryptjs.genSaltSync(10);
-    const hash = bcryptjs.hashSync(password, salt);
-
-    const userData = {
-        name,
-        email,
-        phone,
-        password: hash
-    }
+    const { body } = req;
 
     try {
-        const data = await User.create(userData);
-        success(res, data, 200)
+        const data = await userService.createUser(body);
+        success(res, data, 200);
     } catch (err) {
-        error(res, err, 500)
+        error(res, err.message, 500)
     }
 
 }
@@ -52,14 +35,11 @@ export const updateUser = async ( req, res ) => {
     const { id: _id, password, ...data } = req.body;
 
     try {
-        await User.update(data, {
-            where: { id }
-        })
-        const updatedUser = await User.findByPk(id);
+        const updatedUser = await userService.updateUser(id, data);
         success(res, updatedUser, 200);
     
     } catch (err) {
-        error( res, `Error updating Tutorial with id=${id}`, 500 );   
+        error( res, `Error updating User with id=${id}`, 500 );   
     }
 
 }
@@ -68,15 +48,14 @@ export const deleteUser = async ( req, res ) => {
     
     const { id } = req.params;
 
-
     try {
-        const num = await User.destroy({where: { id }});
+        const num = await userService.deleteUser(id);
         if( num == 1){
             success(res, "User was deleted successfully.", 200);
         } else {
-            error(res, `Cannot delete User with id=${id}. Maybe User was not found or req.body is empty!`, 400 );
+            error(res, `Cannot delete User with id=${id}. Maybe User was not found`, 404 );
         }
     } catch (err) {
-        error( res, `Error updating Tutorial with id=${id}`, 500 );   
+        error( res, `Error updating User with id=${id}`, 500 );   
     }
 }
