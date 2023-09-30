@@ -39,7 +39,7 @@ export class Server {
     }
 
     async conectionToMysql(){
-        await db.sequelize.sync({ force: false })
+        await db.sequelize.sync({ force: true })
         .then(() => {
           console.log("Synced parkingDB.");
         })
