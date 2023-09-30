@@ -58,7 +58,7 @@ describe('Access the parking logs', () => {
         .set('x-token', token);
 
         expect(status).toBe(500); 
-        expect(body.data.message).toEqual(
+        expect(body.data).toEqual(
             expect.stringContaining('Cast to Number failed for value "a"')
         ); 
     });  

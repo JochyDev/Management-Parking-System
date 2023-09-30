@@ -1,3 +1,5 @@
+import  bcryptjs  from "bcryptjs";
+
 import generateJWT from "../helpers/generateJWT.js";
 import { userRepository } from "../repositories/index.js";
 
@@ -11,10 +13,9 @@ export const login = async (email, password ) => {
         }
 
         const validPassword = bcryptjs.compareSync(password, user.password);
-
         // Verificar la contraseña
         if(!validPassword){
-            throw new Error("Password incorrect", 406)
+            throw new Error("Password incorrect")
         }
 
         // Generar el JWT

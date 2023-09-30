@@ -8,7 +8,7 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        const data = authService.login(email, password);
+        const data = await authService.login(email, password);
         success(res, data, 200);
         
     } catch (err) {

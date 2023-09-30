@@ -23,7 +23,7 @@ export const createUser = async(req, res) => {
         const data = await userService.createUser(body);
         success(res, data, 200);
     } catch (err) {
-        error(res, err, 500)
+        error(res, err.message, 500)
     }
 
 }

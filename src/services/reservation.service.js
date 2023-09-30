@@ -1,6 +1,7 @@
 import { Op } from 'sequelize';
 import { logActivity } from '../helpers/logActivity.js';
 import { db } from '../models/sequelize/index.js';
+import { reservationRepository } from '../repositories/index.js';
 const { Reservation, Spot } = db;
 
 export const createReservation = async ( UserId, body ) => {
@@ -9,12 +10,18 @@ export const createReservation = async ( UserId, body ) => {
 
     // Check if the startDateTime is in the past.
     if(new Date(startDateTime) < new Date()){
-      throw new Error(`Cannot create a reservation in past`, 400);
+      const error = new Error();
+      error.message = 'Cannot create a reservation in past';
+      error.status = 400;
+      throw error;
     }
 
     // Check if endDateTime is before startDateTime.
     if(new Date(endDateTime) < new Date(startDateTime)){
-      throw new Error(`endDateTime always have to be after startDateTime`, 400);
+      const error = new Error();
+      error.message = 'endDateTime always have to be after startDateTime';
+      error.status = 400;
+      throw error
     }
 
     // Get the total number of spots available.
@@ -57,7 +64,10 @@ export const createReservation = async ( UserId, body ) => {
     };
 
     if(!SpotId){
-        throw new Error('No hay plazas de aparcamiento disponibles en ese horario.', 400);
+        const error = new Error();
+        error.message = 'No hay plazas de aparcamiento disponibles en ese horario.';
+        error.status = 400;
+        throw error
     };
 
     const reservation = await Reservation.create({
@@ -91,7 +101,7 @@ export const checkInOut = async ( UserId, id, action) => {
   if (!actionMap[action]) {
     return error(res, 'Action isn\'t valid', 400);
   }
-  const reservation = await Reservation.findByPk(id);
+  const reservation = await reservationRepository.getReservationById(id);
 
   if(!reservation){
     return error(res, `Reservation was not found with id=${id}`, 404);

@@ -10,8 +10,16 @@ export function success(res, message, status){
 }
 
 export function error(res, message, status){
-    let statusCode = status || 500;
-    let statusMessage = message || 'Internal Server Error';
+    let statusCode;
+    let statusMessage;
+
+    if (message instanceof Error) {
+        statusCode = message.status || 500;
+        statusMessage = message.message || 'Internal Server Error';
+    } else {
+        statusCode = status || 500;
+        statusMessage = message;
+    }
 
     res.status(statusCode).send({
         error: true,
