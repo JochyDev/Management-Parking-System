@@ -45,37 +45,12 @@ Run the following command to start the server:
    ```
 Once the server is executed, go to the ```./src/server/server.js``` file within the connectionToMysql method, change the force property to ```false```
 
-### API Endpoints
-1. Reserve a Parking Spot: 
-- Endpoint: POST /api/reserve
-- Description: Reserve a parking spot for a specific vehicle at a given date and time.
-- Request Body: JSON with vehicle details and reservation date and time.
-- Response: Details of the reservation.
+### API Endpoints:
+[Click here to see postman collection](https://documenter.getpostman.com/view/16100812/2s9YCAQpkN)
 
-2. Check Parking Occupancy: 
-- Endpoint: GET /api/occupancy
-- Description: Get the current occupancy status of the parking lot.
-- Response: List of parking spots with occupancy details.
 
-3. Update User Details
-- Endpoint: PUT /api/user/{id}
-- Description: Update user details such as name, email, or phone number.
-- Request Body: JSON with updated user details.
-- Response: Updated user details.
-
-4. Access Parking Logs
-- Endpoint: GET /api/logs
-- Description: Access activity logs of the parking system, including reservations, cancellations, vehicle entries, and exits.
-- Response: List of activity logs.
 
 ## Running Tests
-Switch to the jest-testing branch in the project repository:
-
-   ```
-   git checkout jest-testing
-   ```
-
-
 Run the following command to execute the tests:
    
    ```
