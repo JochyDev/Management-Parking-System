@@ -1,8 +1,6 @@
 import { Op } from 'sequelize';
 import { logActivity } from '../helpers/logActivity.js';
-import { db } from '../models/sequelize/index.js';
-import { reservationRepository } from '../repositories/index.js';
-const { Reservation, Spot } = db;
+import { reservationRepository, spotRepository } from '../repositories/index.js';
 
 export const createReservation = async ( UserId, body ) => {
 
@@ -25,33 +23,30 @@ export const createReservation = async ( UserId, body ) => {
     }
 
     // Get the total number of spots available.
-    const totalSpots = await Spot.count();
+    const totalSpots = await spotRepository.countSpots() ;
     let SpotId = null;
 
     // Loop through available spots to find one without overlapping reservations.
     for(let i = 1; i <= totalSpots; i++){
-        const spot = await Spot.findOne({
-          where: {spotNumber: i}
-        })
+        const spot = await this.spotRepository.findBySpotNumber(i);
 
         SpotId = spot.id;
-
-        // Check if there is an overlapping reservation for this spot.
-        const overlappingReservation = await Reservation.findOne({
-          where: {
-            SpotId,
-            [Op.or]: [
-              {
-                startDateTime: {
-                  [Op.lt]: endDateTime,
-                },
-                endDateTime: {
-                  [Op.gt]: startDateTime,
-                },
+        
+        const data = {
+          SpotId,
+          [Op.or]: [
+            {
+              startDateTime: {
+                [Op.lt]: endDateTime,
               },
-            ],
-          },
-        });
+              endDateTime: {
+                [Op.gt]: startDateTime,
+              },
+            },
+          ],
+        }
+        // Check if there is an overlapping reservation for this spot.
+        const overlappingReservation = reservationRepository.findOneReservation(data)
 
         // If there's an overlap, reset SpotId and continue to the next spot.
         if (overlappingReservation) {
@@ -70,18 +65,18 @@ export const createReservation = async ( UserId, body ) => {
         throw error
     };
 
-    const reservation = await Reservation.create({
-        UserId,
-        SpotId,
-        startDateTime,
-        endDateTime,
-        carDetails
-    });
+    const reservationData = {
+      UserId,
+      SpotId,
+      startDateTime,
+      endDateTime,
+      carDetails
+    }
+
+    const reservation = await reservationRepository.createReservation(reservationData);
 
     logActivity(UserId, 'PARKING_RESERVATION');
     return reservation;
-
-    
 }
 
 export const checkInOut = async ( UserId, id, action) => {
@@ -99,45 +94,60 @@ export const checkInOut = async ( UserId, id, action) => {
   
   // Check if the specified action is in the map
   if (!actionMap[action]) {
-    return error(res, 'Action isn\'t valid', 400);
+    const error = new Error();
+    error.message = 'Action isn\'t valid';
+    error.status = 400;
+    throw error;
   }
-  const reservation = await reservationRepository.getReservationById(id);
-
-  if(!reservation){
-    return error(res, `Reservation was not found with id=${id}`, 404);
-  }
-
   // Obtains the status and log corresponding to the action
   const { status, log } = actionMap[action];
 
-  reservation.status = status;
+  const num = await reservationRepository.updateReservation(id, status);
 
-  await reservation.save();
+  if(num != 1){
+    const error = new Error();
+    error.message = `Something went wrong maybe Reservation with id=${id} was not found`;
+    error.status = 400;
+    throw error;
+  }
+
   logActivity(UserId, log);
 }
 
 export const cancelReservation = async( UserId, id) => {
-  const reservation = await Reservation.findByPk(id);
+  const reservation = await this.reservationRepository.getReservationById(id);
 
   if(!reservation){
-    error(res, `Reservation was not found with id=${id}`, 404);
+    const error = new Error();
+    error.message = `Reservation was not found with id=${id}`;
+    error.status = 404;
+    throw error;
   }
 
   if( reservation.status == 'IN_PROGRESS'){
-    return error(res, `The reservation has already started, it cannot be canceled`, 400);
+    const error = new Error();
+    error.message = `The reservation has already started, it cannot be canceled`;
+    error.status = 400;
+    throw error;
   }
 
-  reservation.status = 'CANCELED'
+  const num = await reservationRepository.updateReservation(id, 'CANCELED');
 
-  await reservation.save()
+  if(num != 1){
+    const error = new Error();
+    error.message = `Something went wrong maybe Reservation with id=${id} was not found`;
+    error.status = 400;
+    throw error;
+  }
+
   logActivity(UserId, 'CANCELED_RESERVATION');
 }
 
 export const getCurrentOccupancy = async () => {
 
-  const totalSpots = await Spot.count();
+  const totalSpots = await this.spotRepository.countSpots();
 
-  const parkingSpots = await Reservation.findAll({
+  const data = {
     where: {
       status: 'ACTIVE',
       [Op.and]: [
@@ -151,7 +161,9 @@ export const getCurrentOccupancy = async () => {
         },
       ],
     },
-  })
+  }
+
+  const parkingSpots = this.reservationRepository.findAllReservations(data);
 
   const occupancyDetails = { 
     totalSpots,
