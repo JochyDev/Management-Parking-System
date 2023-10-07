@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import { db } from '../models/sequelize/index.js';
 const { Reservation } = db;
 
@@ -6,8 +7,22 @@ export const getReservationById = async (id) => {
     return await Reservation.findByPk(id);
 }
 
-export const findAllReservations = async( data ) => {
-    return await Reservation.findAll(data);
+export const findAllCurrentReservations = async() => {
+    return await Reservation.findAll({
+        where: {
+          status: 'ACTIVE',
+          [Op.and]: [
+            {
+              startDateTime: {
+                [Op.lt]: new Date(),
+              },
+              endDateTime: {
+                [Op.gt]: new Date(),
+              },
+            },
+          ],
+        },
+      });
 }
 
 export const updateReservation = async (id, data) => {
@@ -16,9 +31,21 @@ export const updateReservation = async (id, data) => {
     })
 }
 
-export const findOneReservation = async (data) => {
+export const findOneOverlappingReservation = async (SpotId, startDateTime, endDateTime) => {    
     return await Reservation.findOne({
-        where: data,
+        where: {
+          SpotId: SpotId,
+          [Op.or]: [
+            {
+              startDateTime: {
+                [Op.lt]: endDateTime,
+              },
+              endDateTime: {
+                [Op.gt]: startDateTime,
+              },
+            },
+          ],
+        },
       });
 }
  

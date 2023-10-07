@@ -28,25 +28,12 @@ export const createReservation = async ( UserId, body ) => {
 
     // Loop through available spots to find one without overlapping reservations.
     for(let i = 1; i <= totalSpots; i++){
-        const spot = await this.spotRepository.findBySpotNumber(i);
+        const spot = await spotRepository.findBySpotNumber(i);
 
         SpotId = spot.id;
         
-        const data = {
-          SpotId,
-          [Op.or]: [
-            {
-              startDateTime: {
-                [Op.lt]: endDateTime,
-              },
-              endDateTime: {
-                [Op.gt]: startDateTime,
-              },
-            },
-          ],
-        }
         // Check if there is an overlapping reservation for this spot.
-        const overlappingReservation = reservationRepository.findOneReservation(data)
+        const overlappingReservation = await reservationRepository.findOneOverlappingReservation(SpotId, startDateTime, endDateTime);
 
         // If there's an overlap, reset SpotId and continue to the next spot.
         if (overlappingReservation) {
@@ -145,25 +132,9 @@ export const cancelReservation = async( UserId, id) => {
 
 export const getCurrentOccupancy = async () => {
 
-  const totalSpots = await this.spotRepository.countSpots();
+  const totalSpots = await spotRepository.countSpots();
 
-  const data = {
-    where: {
-      status: 'ACTIVE',
-      [Op.and]: [
-        {
-          startDateTime: {
-            [Op.lt]: new Date(),
-          },
-          endDateTime: {
-            [Op.gt]: new Date(),
-          },
-        },
-      ],
-    },
-  }
-
-  const parkingSpots = this.reservationRepository.findAllReservations(data);
+  const parkingSpots = await reservationRepository.findAllCurrentReservations();
 
   const occupancyDetails = { 
     totalSpots,

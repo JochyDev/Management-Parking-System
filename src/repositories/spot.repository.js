@@ -8,6 +8,6 @@ export const countSpots = async () => {
 
 export const findBySpotNumber = async( spotNumber ) => {
     return await Spot.findOne({
-        where: { spotNumber }
+        where: { spotNumber: spotNumber }
       })
 }
